@@ -2,6 +2,7 @@ package urls
 
 type ShortenUrlIn struct {
 	OriginalURL string
+	Alias       string
 }
 
 type ShortenURLOut struct {

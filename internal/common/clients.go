@@ -2,8 +2,8 @@ package common
 
 import (
 	"fmt"
-	"ozon_trainee_task/internal/config"
 
+	"github.com/golovpeter/ozon-trainee-task/internal/config"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/pressly/goose"

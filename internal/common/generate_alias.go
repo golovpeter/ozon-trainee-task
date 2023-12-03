@@ -1,20 +1,18 @@
 package common
 
 import (
-	"math/rand"
-	"time"
+	"crypto/sha256"
+	"encoding/hex"
 )
 
-func GenerateAlias() string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
-	const keyLength = 6
+func GenerateAlias(input string) string {
+	const keyLength = 10
 
-	rand.Seed(time.Now().UnixNano())
-	shortKey := make([]byte, keyLength)
+	hasher := sha256.New()
 
-	for i := range shortKey {
-		shortKey[i] = charset[rand.Intn(len(charset))]
-	}
+	hasher.Write([]byte(input))
+	hashInBytes := hasher.Sum(nil)
+	hash := hex.EncodeToString(hashInBytes)[:keyLength]
 
-	return string(shortKey)
+	return hash
 }

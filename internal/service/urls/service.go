@@ -2,7 +2,9 @@ package urls
 
 import (
 	"context"
-	"ozon_trainee_task/internal/repository/urls"
+
+	"github.com/golovpeter/ozon-trainee-task/internal/common"
+	"github.com/golovpeter/ozon-trainee-task/internal/repository/urls"
 )
 
 type service struct {
@@ -14,8 +16,11 @@ func NewService(urlsRepository urls.Repository) *service {
 }
 
 func (s *service) ShortenURL(ctx context.Context, in *ShortenUrlIn) (*ShortenURLOut, error) {
-	url, err := s.urlsRepository.ShortenURL(ctx, &urls.ShortenUrlIn{
+	newAlias := common.GenerateAlias(in.OriginalURL)
+
+	url, err := s.urlsRepository.SaveShortenedURL(ctx, &urls.ShortenUrlIn{
 		OriginalURL: in.OriginalURL,
+		Alias:       newAlias,
 	})
 
 	if err != nil {
@@ -26,6 +31,12 @@ func (s *service) ShortenURL(ctx context.Context, in *ShortenUrlIn) (*ShortenURL
 }
 
 func (s *service) GetOriginalURL(ctx context.Context, in *GetOriginalURLIn) (*GetOriginalURlOut, error) {
-	//TODO implement me
-	panic("implement me")
+	alias := common.GetAlias(in.ShortURL)
+
+	out, err := s.urlsRepository.GetOriginalURL(ctx, &urls.GetOriginalURLIn{ShortURL: alias})
+	if err != nil {
+		return nil, err
+	}
+
+	return &GetOriginalURlOut{OriginalURL: out.OriginalURL}, nil
 }

@@ -1,9 +1,8 @@
 package urls
 
 import (
-	urlsService "ozon_trainee_task/internal/service/urls"
-	"ozon_trainee_task/protos/gen/go/url_shortener"
-
+	urlsService "github.com/golovpeter/ozon-trainee-task/internal/service/urls"
+	"github.com/golovpeter/ozon-trainee-task/protos/gen/go/url_shortener"
 	"github.com/sirupsen/logrus"
 )
 

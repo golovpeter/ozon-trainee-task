@@ -1,14 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"net"
-	"ozon_trainee_task/internal/common"
-	"ozon_trainee_task/internal/config"
-	"ozon_trainee_task/internal/handler/urls"
-	urlRepository "ozon_trainee_task/internal/repository/urls"
-	urlsService "ozon_trainee_task/internal/service/urls"
-	"ozon_trainee_task/protos/gen/go/url_shortener"
+	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/golovpeter/ozon-trainee-task/internal/common"
+	"github.com/golovpeter/ozon-trainee-task/internal/config"
+	"github.com/golovpeter/ozon-trainee-task/internal/handler/urls"
+	urlRepository "github.com/golovpeter/ozon-trainee-task/internal/repository/urls"
+	urlsService "github.com/golovpeter/ozon-trainee-task/internal/service/urls"
+	"github.com/golovpeter/ozon-trainee-task/protos/gen/go/url_shortener"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -33,12 +37,12 @@ func main() {
 		logger.Fatalln("error to create database client:", err)
 	}
 
-	lis, err := net.Listen("tcp", ":8080")
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Server.Port))
 	if err != nil {
 		logger.Fatalln("cant listen port:", err)
 	}
 
-	urlRepo := urlRepository.NewRepository(dbConn)
+	urlRepo := urlRepository.NewRepositoryPostgres(dbConn)
 	urlService := urlsService.NewService(urlRepo)
 	urlsHandler := urls.NewHandler(logger, urlService)
 
@@ -46,7 +50,21 @@ func main() {
 
 	url_shortener.RegisterUrlShortenerServer(server, urlsHandler)
 
-	logger.Info("grpc server starting at :8081")
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+
+	go func() {
+		<-signalChan
+
+		err = dbConn.Close()
+		if err != nil {
+			return
+		}
+
+		server.GracefulStop()
+	}()
+
+	logger.Infof("grpc server starting at :%d", cfg.Server.Port)
 	if err = server.Serve(lis); err != nil {
 		panic(err)
 	}
