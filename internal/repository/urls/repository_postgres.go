@@ -73,12 +73,12 @@ func (r *repositoryPostgres) GetOriginalURL(ctx context.Context, in *GetOriginal
 	var originalURL string
 
 	err := r.dbConn.GetContext(ctx, &originalURL, getOriginURLQuery, in.ShortURL)
-	if err != nil {
-		return nil, err
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		return nil, errors.New("original url not found")
 	}
 
-	if originalURL == "" {
-		return nil, errors.New("original url not found")
+	if err != nil {
+		return nil, err
 	}
 
 	return &GetOriginalURlOut{OriginalURL: originalURL}, nil

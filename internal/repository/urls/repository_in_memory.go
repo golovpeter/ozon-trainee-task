@@ -25,12 +25,12 @@ func (r repositoryInMemory) SaveShortenedURL(
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, ok := r.data[in.OriginalURL]; ok {
-		return &ShortenURLOut{Alias: r.data[in.OriginalURL]}, nil
+	if r.data[in.Alias] == in.OriginalURL {
+		return &ShortenURLOut{Alias: in.Alias}, nil
 	}
 
-	r.data[in.OriginalURL] = in.Alias
-	return &ShortenURLOut{Alias: r.data[in.OriginalURL]}, nil
+	r.data[in.Alias] = in.OriginalURL
+	return &ShortenURLOut{Alias: in.Alias}, nil
 
 }
 
@@ -41,11 +41,10 @@ func (r repositoryInMemory) GetOriginalURL(
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	for url, alias := range r.data {
-		if alias == in.ShortURL {
-			return &GetOriginalURlOut{OriginalURL: url}, nil
-		}
+	if _, ok := r.data[in.ShortURL]; !ok {
+		return nil, errors.New("original url not found")
 	}
 
-	return nil, errors.New("original url not found")
+	return &GetOriginalURlOut{OriginalURL: r.data[in.ShortURL]}, nil
+
 }
