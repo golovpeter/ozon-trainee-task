@@ -42,7 +42,8 @@ func main() {
 		logger.Fatalln("cant listen port:", err)
 	}
 
-	urlRepo := urlRepository.NewRepositoryPostgres(dbConn)
+	//urlRepo := urlRepository.NewRepositoryPostgres(dbConn)
+	urlRepo := urlRepository.NewRepositoryInMemory()
 	urlService := urlsService.NewService(urlRepo)
 	urlsHandler := urls.NewHandler(logger, urlService)
 

@@ -77,5 +77,9 @@ func (r *repositoryPostgres) GetOriginalURL(ctx context.Context, in *GetOriginal
 		return nil, err
 	}
 
+	if originalURL == "" {
+		return nil, errors.New("original url not found")
+	}
+
 	return &GetOriginalURlOut{OriginalURL: originalURL}, nil
 }
