@@ -25,11 +25,10 @@ func (r repositoryInMemory) SaveShortenedURL(
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if r.data[in.Alias] == in.OriginalURL {
-		return &ShortenURLOut{Alias: in.Alias}, nil
+	if r.data[in.Alias] != in.OriginalURL {
+		r.data[in.Alias] = in.OriginalURL
 	}
 
-	r.data[in.Alias] = in.OriginalURL
 	return &ShortenURLOut{Alias: in.Alias}, nil
 
 }

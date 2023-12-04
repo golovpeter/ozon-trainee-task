@@ -15,10 +15,12 @@ func NewService(urlsRepository urls.Repository) *service {
 	return &service{urlsRepository: urlsRepository}
 }
 
-func (s *service) ShortenURL(ctx context.Context, in *ShortenUrlIn) (*ShortenURLOut, error) {
-	newAlias := common.GenerateAlias(in.OriginalURL)
+var generateAlias = common.GenerateAlias
 
-	url, err := s.urlsRepository.SaveShortenedURL(ctx, &urls.ShortenUrlIn{
+func (s *service) ShortenURL(ctx context.Context, in *ShortenUrlIn) (*ShortenURLOut, error) {
+	newAlias := generateAlias(in.OriginalURL)
+
+	out, err := s.urlsRepository.SaveShortenedURL(ctx, &urls.ShortenUrlIn{
 		OriginalURL: in.OriginalURL,
 		Alias:       newAlias,
 	})
@@ -27,7 +29,7 @@ func (s *service) ShortenURL(ctx context.Context, in *ShortenUrlIn) (*ShortenURL
 		return nil, err
 	}
 
-	return &ShortenURLOut{Alias: url.Alias}, nil
+	return &ShortenURLOut{Alias: out.Alias}, nil
 }
 
 func (s *service) GetOriginalURL(ctx context.Context, in *GetOriginalURLIn) (*GetOriginalURlOut, error) {

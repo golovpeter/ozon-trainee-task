@@ -4,16 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-
-	"github.com/jmoiron/sqlx"
 )
 
 type repositoryPostgres struct {
-	dbConn *sqlx.DB
+	db Database
 }
 
-func NewRepositoryPostgres(dbConn *sqlx.DB) *repositoryPostgres {
-	return &repositoryPostgres{dbConn: dbConn}
+func NewRepositoryPostgres(db Database) *repositoryPostgres {
+	return &repositoryPostgres{db: db}
 }
 
 const checkExistOriginalURL = `
@@ -31,7 +29,7 @@ const insertShortUrlQuery = `
 func (r *repositoryPostgres) SaveShortenedURL(ctx context.Context, in *ShortenUrlIn) (*ShortenURLOut, error) {
 	var alias string
 
-	tx, err := r.dbConn.BeginTxx(ctx, nil)
+	tx, err := r.db.BeginTxx(ctx, nil)
 
 	defer func() {
 		if rec := recover(); rec != nil {
@@ -72,7 +70,7 @@ const getOriginURLQuery = `
 func (r *repositoryPostgres) GetOriginalURL(ctx context.Context, in *GetOriginalURLIn) (*GetOriginalURlOut, error) {
 	var originalURL string
 
-	err := r.dbConn.GetContext(ctx, &originalURL, getOriginURLQuery, in.ShortURL)
+	err := r.db.GetContext(ctx, &originalURL, getOriginURLQuery, in.ShortURL)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		return nil, errors.New("original url not found")
 	}
