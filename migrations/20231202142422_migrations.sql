@@ -9,10 +9,13 @@ CREATE TABLE IF NOT EXISTS url_mappings
     alias        VARCHAR(255) UNIQUE      NOT NULL,
     created_at   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
+
+CREATE INDEX IF NOT EXISTS url_mappings_alias_idx ON url_mappings (alias);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS url_mappings;
 DROP EXTENSION IF EXISTS "uuid-ossp";
+DROP INDEX IF EXISTS url_mappings_alias_idx;
+DROP TABLE IF EXISTS url_mappings;
 -- +goose StatementEnd
