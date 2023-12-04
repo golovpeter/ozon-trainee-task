@@ -32,31 +32,6 @@ func TestRunPostgresSuite(t *testing.T) {
 	suite.Run(t, new(PostgresSuite))
 }
 
-//func (s *PostgresSuite) TestSaveShortenedURLSuccess() {
-//	var alias string
-//	input := &ShortenUrlIn{OriginalURL: "https://example.com", Alias: "abc"}
-//	expectedOutput := &ShortenURLOut{Alias: "abc"}
-//
-//	s.dbMock.EXPECT().
-//		BeginTxx(context.Background(), nil).
-//		Times(1).Return(&sqlx.Tx{}, nil)
-//
-//	s.dbMock.EXPECT().
-//		GetContext(context.TODO(), &alias, gomock.Any(), input.OriginalURL).
-//		Times(1).
-//		Return(nil)
-//
-//	s.dbMock.EXPECT().
-//		ExecContext(context.TODO(), gomock.Any(), input.OriginalURL, input.Alias).
-//		Return(nil, nil).
-//		Times(1)
-//
-//	output, err := s.repository.SaveShortenedURL(context.Background(), input)
-//
-//	assert.NoError(s.T(), err)
-//	assert.Equal(s.T(), expectedOutput.Alias, output.Alias)
-//}
-
 func (s *PostgresSuite) TestGetOriginalURLSuccess() {
 	var originalURL string
 	input := &GetOriginalURLIn{ShortURL: "abc"}
